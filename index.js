@@ -1,40 +1,22 @@
-var numbers = [];
-var n = 0;
-while (++n <= 90) {
-    numbers.push(n);
-}
+var Ticket = require('./Ticket');
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
+app.get('/', function(req, res) {
+    res.sendFile(__dirname + '/index.html');
+});
 
 
+var ticket = new Ticket();
 
-var columns = {};
-for (var c = 1; c <= 9; c++) {
-    columns["col" + c] = [];
-}
+io.on('connection', function(socket) {
+    console.log('a user connected');
+    //send a bingo ticket to user
 
-selectedNumbers = 0;
-emptyColumns = 9;
+  
+})
 
-while (selectedNumbers !== 15) {
-    var index = Math.floor(Math.random() * numbers.length);
-    var current = numbers[index];
-    var column = "col" + Math.ceil(current / 10);
-    if (emptyColumns !== 0) { //make sure we have at least one number in every column
-        if (columns[column].length === 0) {
-            addNumberToTicket(column, current, index);
-            emptyColumns--;
-        }
-    } else {
-        if (columns[column].length < 3) { //we can have max 3 numbers in column
-            addNumberToTicket(column, current, index);
-        }
-    }
-
-
-
-}
-
-function addNumberToTicket(column, number) {
-    columns[column].push(number);
-    selectedNumbers++;
-    numbers.splice(index, 1);
-}
+http.listen(3000, function() {
+    console.log('listening on *:3000');
+});
