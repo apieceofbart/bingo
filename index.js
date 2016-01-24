@@ -1,4 +1,5 @@
 var Ticket = require('./Ticket');
+var numbers = require('./numbers');
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -15,11 +16,11 @@ io.on('connection', function(socket) {
     console.log('a user connected');
     //send a bingo ticket to user
     socket.on('user joined', function(user) {
-		users[socket.id] = user;
-		io.sockets.connected[socket.id].emit('ticket given', ticket);
-	});
+        users[socket.id] = user;
+        io.sockets.connected[socket.id].emit('ticket given', ticket);
+    });
 
-	socket.on('disconnect', function() {
+    socket.on('disconnect', function() {
         var left = users[socket.id];
         delete users[socket.id];
         io.emit('user disconnected', {
@@ -27,7 +28,7 @@ io.on('connection', function(socket) {
             users: users
         })
     })
-  
+
 });
 
 

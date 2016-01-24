@@ -1,8 +1,6 @@
-var numbers = [];
-var n = 0;
-while (++n <= 90) {
-    numbers.push(n);
-}
+var numbers = require('./numbers');
+var shuffle = require('./shuffle');
+
 var columns = [];
 for (var c = 0; c < 9; c++) {
     columns[c] = [];
@@ -34,16 +32,6 @@ columns.map(function(column) {
     column = shuffle(column);
     //TODO we want sorted results but with blanks
 });
-
-function shuffle(arr) {
-    for (var i = arr.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = arr[j];
-        arr[j] = arr[i];
-        arr[i] = temp;
-    }
-    return arr;
-}
 
 function addNumberToTicket(column, number) {
     columns[column].push(number);
