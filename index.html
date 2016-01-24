@@ -1,46 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Let's play bingo!</title>
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <style type="text/css">
     .margin-top {
-        margin-top:1em;
+        margin-top: 1em;
     }
+    
     .center-me {
-        margin-left:auto;
-        margin-right:auto;
+        margin-left: auto;
+        margin-right: auto;
         display: block;
+    }
+    
+    table tr td {
+        text-align: center;
+        padding: 1em;
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    
+    #ticket {
+        display: none;
     }
     </style>
 </head>
 
 <body>
     <div class="container-fluid">
-
-        <div class="row">        
+        <div class="row">
             <div class="col-md-2 col-md-offset-5">
-             <h1>Let's play Bingo!</h1>
-            </div>
-            </div>
-             <div class="row margin-top">        
-            <div class="col-md-2 col-md-offset-5">
-                <form class="form-inline" id="nick-form">
-  <div class="form-group">
-    <label  for="nick">Nickname</label>
-    <input type="text" class="form-control" id="nick" placeholder="player">
-  </div>
-  <button type="submit" class="btn btn-primary margin-top center-me">Go!</button>
-</form>
+                <h1>Let's play Bingo!</h1>
             </div>
         </div>
+        <div class="row margin-top">
+            <div class="col-md-2 col-md-offset-5">
+                <form class="form-inline" id="nick-form">
+                    <div class="form-group">
+                        <label for="nick">Nickname</label>
+                        <input type="text" class="form-control" id="nick" placeholder="player">
+                    </div>
+                    <button type="submit" class="btn btn-primary margin-top center-me">Go!</button>
+                </form>
+            </div>
+        </div>
+        <div class="row" id="ticket">
+            <table class="table table-bordered">
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
     </div>
-
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
     <script>
     var socket = io();
     var nick;
@@ -48,9 +95,10 @@
     $('#nick-form').submit(function() {
         nick = $('#nick').val();
         socket.emit('user joined', nick);
-         $(this).parents().eq(1).fadeOut(500, function(){
-             $(this).remove();
-         })
+        $(this).parents().eq(1).fadeOut(500, function() {
+            $(this).remove();
+            $('#ticket').show();
+        })
         return false;
     })
     socket.on('user joined', function(data) {
@@ -64,8 +112,16 @@
     });
 
     socket.on('ticket given', function(ticket) {
-        console.log(ticket);
+        $('table tr').each(function(index, row) {
+            $(row).find('td').each(function(i, td) {
+                var num = ticket.rows[index][i];
+                if (num) $(td).text(num);
+            })
+        });
+
+
     })
+
 
     function updateUsers(users) {
         $('#users').html('');
