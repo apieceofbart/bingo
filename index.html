@@ -26,6 +26,10 @@
     #ticket {
         display: none;
     }
+    
+    td.cross-out {
+        background-color: orange;
+    }
     </style>
 </head>
 
@@ -34,6 +38,7 @@
         <div class="row">
             <div class="col-sm-4 col-sm-offset-4">
                 <h1>Let's play Bingo!</h1>
+                <button class="btn btn-danger" id="start">Start!</button>
             </div>
         </div>
         <div class="row margin-top">
@@ -45,6 +50,11 @@
                     </div>
                     <button type="submit" class="btn btn-primary margin-top center-me">Go!</button>
                 </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 col-md-offset-5">
+                <h1 id="number"></h1>
             </div>
         </div>
         <div class="row" id="ticket">
@@ -88,48 +98,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script>
-    var socket = io();
-    var nick;
-    var $messages = $('#messages');
-    $('#nick-form').submit(function() {
-        nick = $('#nick').val();
-        socket.emit('user joined', nick);
-        $(this).parents().eq(1).fadeOut(500, function() {
-            $(this).remove();
-            $('#ticket').show();
-        })
-        return false;
-    })
-    socket.on('user joined', function(data) {
-        //$messages.append($('<li class="user-joined">').text(data.joined + ' joined! Say hello!'));
-        //updateUsers(data.users);
-    });
-
-    socket.on('user disconnected', function(data) {
-        //$messages.append($('<li class="user-left">').text(data.left + ' has left:('));
-        //updateUsers(data.users);
-    });
-
-    socket.on('ticket given', function(ticket) {
-        $('table tr').each(function(index, row) {
-            $(row).find('td').each(function(i, td) {
-                var num = ticket.rows[index][i];
-                if (num) $(td).text(num);
-            })
-        });
-
-
-    })
-
-
-    function updateUsers(users) {
-        $('#users').html('');
-        for (var user in users) {
-            $('#users').append($('<li>').text(users[user]));
-        };
-    }
-    </script>
+    <script src="client.js"></script>
 </body>
 
 </html>

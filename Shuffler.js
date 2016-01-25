@@ -1,4 +1,6 @@
-function shuffle(arr) {
+function Shuffler() {}
+
+Shuffler.prototype.shuffle = function(arr) {
     for (var i = arr.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
         var temp = arr[j];
@@ -8,4 +10,4 @@ function shuffle(arr) {
     return arr;
 }
 
-module.exports = shuffle;
+module.exports = Shuffler;
