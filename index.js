@@ -15,6 +15,7 @@ app.get('/', function(req, res) {
 
 
 var users = {};
+var gameIsOn = false;
 
 io.on('connection', function(socket) {
 
@@ -45,9 +46,13 @@ io.on('connection', function(socket) {
     });
 
     socket.on('give me ticket', function() {
-        var ticket = new Ticket();
-        io.sockets.connected[socket.id].emit('ticket given', ticket);
-        console.log('sending ticket to user');
+        if (!gameIsOn) {
+            var ticket = new Ticket();
+            io.sockets.connected[socket.id].emit('ticket given', ticket);
+            console.log('sending ticket to user');
+        } else {
+            io.sockets.connected[socket.id].emit('game is on');
+        }
     })
 
 
@@ -58,6 +63,7 @@ io.on('connection', function(socket) {
         console.log('bingo called, clearing interval, the winner is:', winner);
         bingoCalled = true;
         clearInterval(interval);
+        gameIsOn = false;
     })
 
 });
@@ -68,13 +74,12 @@ var startNewGame = function() {
 
     var bingoCalled = false;
     var randomNumbers = shuffle(Numbers());
+    gameIsOn = true;
 
     interval = setInterval(function() {
         if (!bingoCalled) {
             console.log('new number! numbers left:', randomNumbers.length);
             io.emit('number drawn', randomNumbers.shift());
-        } else {
-            console.log('still running after bingo!');
         }
     }, 500);
 

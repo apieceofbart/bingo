@@ -54,6 +54,10 @@ $(document).ready(function() {
         drawTicket();
     })
 
+    socket.on('game is on', function() {
+        alert('Sorry, game already started. Please try in a minute!');
+    })
+
     socket.on('number drawn', function(number) {
         $('#number').text(number);
         removeNumber(number);
