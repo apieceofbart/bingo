@@ -4,12 +4,13 @@ $(document).ready(function() {
     var $messages = $('#messages');
     var numbers = [];
     var userTicket = {};
-
+    var isAdmin = false;
 
     $('#nick-form').submit(function() {
         nick = $('#nick').val();
         if (nick) {
             socket.emit('user joined', nick);
+            socket.emit('give me ticket');
             $(this).parents().eq(1).fadeOut(500, function() {
                 $(this).remove();
                 $('#ticket').show();
@@ -20,20 +21,16 @@ $(document).ready(function() {
         return false;
     })
 
-
-
-
     socket.on('user joined', function(data) {
-        //$messages.append($('<li class="user-joined">').text(data.joined + ' joined! Say hello!'));
         updateUsers(data.users);
     });
 
     socket.on('user disconnected', function(data) {
-        //$messages.append($('<li class="user-left">').text(data.left + ' has left:('));
         updateUsers(data.users);
     });
 
     socket.on('first user', function() {
+        isAdmin = true; //from now on this person starts each game
         var startBtn = $('<button/>', {
             text: "Start!",
             id: "start",
@@ -44,7 +41,7 @@ $(document).ready(function() {
             }
         });
         var helloMsg = $('<p/>', {
-            text: 'You\'re the first to join, you decide where the game starts!'
+            text: 'You\'re the first to join, you decide when the game starts!'
         })
         $('h1').eq(0).after(startBtn).after(helloMsg);
 
@@ -65,8 +62,16 @@ $(document).ready(function() {
 
     socket.on('bingo', function(winner) {
         $('#number').html('BINGO!\n' + winner + ' won!');
+        $('#newGame').show();
     })
 
+    $('#newGame').click(function() {
+        if (isAdmin) $('#start').show();
+        //ask for ticket
+        socket.emit('give me ticket');
+        $('#number').html('');
+        $(this).hide();
+    });
 
     function updateUsers(users) {
         $('#users').html('');
@@ -90,16 +95,16 @@ $(document).ready(function() {
         if (numbers.length === 12) { //27 - 15, there are 12 nulls            
             socket.emit('bingo', nick);
             $('#number').html('BINGO!\n You won!');
-            $('#start').show();
+            $('#newGame').show();
         }
     }
 
     function drawTicket() {
         //go through the numbers array to see which numbers are left       
-
+        //also clean after last game
         $('table tr').each(function(index, row) {
             $(row).find('td').each(function(i, td) {
-
+                $(td).removeClass('cross-out').text('');
                 var num = userTicket.rows[index][i];
                 if (num) {
                     $(td).text(num);

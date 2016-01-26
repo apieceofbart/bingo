@@ -25,14 +25,13 @@ io.on('connection', function(socket) {
         if (Object.keys(users).length === 0) {
             io.sockets.connected[socket.id].emit('first user');
         }
-        var ticket = new Ticket();
+
         users[socket.id] = user;
         io.emit('user joined', {
             joined: user,
             users: users
         });
-        io.sockets.connected[socket.id].emit('ticket given', ticket);
-        console.log('sending ticket to user');
+
     });
 
     socket.on('disconnect', function() {
@@ -44,6 +43,12 @@ io.on('connection', function(socket) {
             users: users
         })
     });
+
+    socket.on('give me ticket', function() {
+        var ticket = new Ticket();
+        io.sockets.connected[socket.id].emit('ticket given', ticket);
+        console.log('sending ticket to user');
+    })
 
 
     socket.on('game start', startNewGame)
