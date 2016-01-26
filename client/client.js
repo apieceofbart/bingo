@@ -8,11 +8,15 @@ $(document).ready(function() {
 
     $('#nick-form').submit(function() {
         nick = $('#nick').val();
-        socket.emit('user joined', nick);
-        $(this).parents().eq(1).fadeOut(500, function() {
-            $(this).remove();
-            $('#ticket').show();
-        })
+        if (nick) {
+            socket.emit('user joined', nick);
+            $(this).parents().eq(1).fadeOut(500, function() {
+                $(this).remove();
+                $('#ticket').show();
+            })
+        } else {
+            $('.alert').show();
+        }
         return false;
     })
 
@@ -36,7 +40,7 @@ $(document).ready(function() {
             class: "btn btn-danger",
             click: function() {
                 socket.emit('game start');
-                $(this).remove();
+                $(this).hide();
             }
         });
         var helloMsg = $('<p/>', {
@@ -60,7 +64,7 @@ $(document).ready(function() {
     });
 
     socket.on('bingo', function(winner) {
-        $('#number').text('BINGO!' + winner + ' won!');
+        $('#number').html('BINGO!\n' + winner + ' won!');
     })
 
 
@@ -83,10 +87,10 @@ $(document).ready(function() {
             numbers.splice(index, 1);
         }
         console.log(numbers.length);
-        if (numbers.length === 12) { //27 - 15, there are 12 nulls
-            console.log('bingo!');
+        if (numbers.length === 12) { //27 - 15, there are 12 nulls            
             socket.emit('bingo', nick);
-            $('#number').text('BINGO!');
+            $('#number').html('BINGO!\n You won!');
+            $('#start').show();
         }
     }
 

@@ -36,6 +36,10 @@
         bottom: 0;
         font-size: 12px;
     }
+    
+    .alert {
+        display: none;
+    }
     </style>
 </head>
 
@@ -52,6 +56,10 @@
                     <div class="form-group">
                         <label for="nick">Nickname</label>
                         <input type="text" class="form-control" id="nick" placeholder="player">
+                    </div>
+                    <div class="alert alert-danger" role="alert">
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <span class="sr-only">Error:</span> C'mon at least 1 character!
                     </div>
                     <button type="submit" class="btn btn-primary margin-top center-me">Go!</button>
                 </form>
@@ -101,7 +109,7 @@
         </div>
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h4 class="panel-title">Users:</h4>
+                <h4 class="panel-title">Players:</h4>
             </div>
             <div class="panel-body">
                 <ul id="users" class="list-group"></ul>
