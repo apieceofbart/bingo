@@ -1,21 +1,17 @@
 var Numbers = require('./Numbers');
-
-var Shuffler = require('./Shuffler');
-
+var shuffle = require('./shuffle');
 
 function generateColumns() {
 
-
-    var shuffle = new Shuffler().shuffle;
-    var numbers = shuffle(new Numbers().getNumbers());
+    var numbers = shuffle(Numbers());
 
     var columns = [];
     for (var c = 0; c < 9; c++) {
         columns[c] = [];
     }
 
-    selectedNumbers = 0;
-    emptyColumns = 9;
+    var selectedNumbers = 0;
+    var emptyColumns = 9;
     var index = 0;
     while (selectedNumbers !== 15) {
         var current = numbers.shift();

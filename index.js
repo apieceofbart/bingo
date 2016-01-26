@@ -1,7 +1,7 @@
 var Ticket = require('./Ticket');
 var Numbers = require('./Numbers');
 
-var Shuffler = require('./Shuffler');
+var shuffle = require('./shuffle');
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -54,7 +54,7 @@ var interval;
 var startNewGame = function() {
 
     var bingoCalled = false;
-    var randomNumbers = new Shuffler().shuffle(new Numbers().getNumbers());
+    var randomNumbers = shuffle(Numbers());
 
     interval = setInterval(function() {
         if (!bingoCalled) {
