@@ -16,21 +16,35 @@ $(document).ready(function() {
         return false;
     })
 
-    $('#start').click(function() {
-        socket.emit('game start');
-        $(this).remove();
-    })
+
 
 
     socket.on('user joined', function(data) {
         //$messages.append($('<li class="user-joined">').text(data.joined + ' joined! Say hello!'));
-        //updateUsers(data.users);
+        updateUsers(data.users);
     });
 
     socket.on('user disconnected', function(data) {
         //$messages.append($('<li class="user-left">').text(data.left + ' has left:('));
-        //updateUsers(data.users);
+        updateUsers(data.users);
     });
+
+    socket.on('first user', function() {
+        var startBtn = $('<button/>', {
+            text: "Start!",
+            id: "start",
+            class: "btn btn-danger",
+            click: function() {
+                socket.emit('game start');
+                $(this).remove();
+            }
+        });
+        var helloMsg = $('<p/>', {
+            text: 'You\'re the first to join, you decide where the game starts!'
+        })
+        $('h1').eq(0).after(startBtn).after(helloMsg);
+
+    })
 
     socket.on('ticket given', function(ticket) {
         console.log('ticket given');
@@ -53,7 +67,9 @@ $(document).ready(function() {
     function updateUsers(users) {
         $('#users').html('');
         for (var user in users) {
-            $('#users').append($('<li>').text(users[user]));
+            $('#users').append($('<li>', {
+                class: "list-group-item"
+            }).text(users[user]));
         };
     }
 

@@ -21,8 +21,16 @@ io.on('connection', function(socket) {
     console.log('a user connected');
     //send a bingo ticket to user
     socket.on('user joined', function(user) {
+        //if this is the first user to join he becomes the host
+        if (Object.keys(users).length === 0) {
+            io.sockets.connected[socket.id].emit('first user');
+        }
         var ticket = new Ticket();
         users[socket.id] = user;
+        io.emit('user joined', {
+            joined: user,
+            users: users
+        });
         io.sockets.connected[socket.id].emit('ticket given', ticket);
         console.log('sending ticket to user');
     });
