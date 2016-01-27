@@ -10,7 +10,6 @@ $(document).ready(function() {
         nick = $('#nick').val();
         if (nick) {
             socket.emit('user joined', nick);
-            socket.emit('give me ticket');
             $(this).parents().eq(1).fadeOut(500, function() {
                 $(this).remove();
                 $('#ticket').show();
@@ -66,16 +65,13 @@ $(document).ready(function() {
 
     socket.on('bingo', function(winner) {
         $('#number').html('BINGO!\n' + winner + ' won!');
-        $('#newGame').show();
-    })
-
-    $('#newGame').click(function() {
-        if (isAdmin) $('#start').show();
-        //ask for ticket
-        socket.emit('give me ticket');
-        $('#number').html('');
-        $(this).hide();
+        newGame();
     });
+
+    function newGame() {
+        if (isAdmin) $('#start').show();
+        $('#start').text('Another game');
+    }
 
     function updateUsers(users) {
         $('#users').html('');
@@ -95,11 +91,12 @@ $(document).ready(function() {
         if (index > -1) {
             numbers.splice(index, 1);
         }
-        console.log(numbers.length);
-        if (numbers.length === 12) { //27 - 15, there are 12 nulls            
+        if (numbers.length === 12) { //27 - 15, there are 12 nulls     
+            console.log('emitting bingo!');
             socket.emit('bingo', nick);
             $('#number').html('BINGO!\n You won!');
-            $('#newGame').show();
+            newGame();
+
         }
     }
 

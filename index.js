@@ -1,6 +1,6 @@
 var Ticket = require('./Ticket');
 var Numbers = require('./Numbers');
-
+var config = require('./config');
 var shuffle = require('./shuffle');
 var express = require('express');
 var app = express();
@@ -46,17 +46,13 @@ io.on('connection', function(socket) {
     });
 
     socket.on('give me ticket', function() {
-        if (!gameIsOn) {
-            var ticket = new Ticket();
-            io.sockets.connected[socket.id].emit('ticket given', ticket);
-            console.log('sending ticket to user');
-        } else {
-            io.sockets.connected[socket.id].emit('game is on');
-        }
+
     })
 
 
-    socket.on('game start', startNewGame)
+    socket.on('game start', function() {
+        startNewGame(socket);
+    })
 
     socket.on('bingo', function(winner) {
         socket.broadcast.emit('bingo', winner);
@@ -70,20 +66,45 @@ io.on('connection', function(socket) {
 
 var interval;
 
-var startNewGame = function() {
+var startNewGame = function(socket) {
 
-    var bingoCalled = false;
-    var randomNumbers = shuffle(Numbers());
-    gameIsOn = true;
+    if (!gameIsOn) {
+        sendTicket();
+        console.log('game will start in ', config.gameStartDelay, ' miliseconds');
+        var timer = setTimeout(function() {
 
-    interval = setInterval(function() {
-        if (!bingoCalled) {
-            console.log('new number! numbers left:', randomNumbers.length);
-            io.emit('number drawn', randomNumbers.shift());
-        }
-    }, 500);
+            var bingoCalled = false;
+            var randomNumbers = shuffle(Numbers());
+            gameIsOn = true;
+
+            interval = setInterval(function() {
+                if (!bingoCalled) {
+                    io.emit('number drawn', randomNumbers.shift());
+                }
+            }, config.numbersDrawInterval);
+
+        }, config.gameStartDelay);
+
+    } else {
+        io.sockets.connected[socket.id].emit('game is on');
+    }
+
+
 
 };
+
+function sendTicket() {
+
+    Object.keys(io.sockets.connected).forEach(function(socket) {
+        console.log('socket:', io.sockets.connected[socket]);
+        var ticket = new Ticket();
+        io.sockets.connected[socket].emit('ticket given', ticket);
+        console.log('sending ticket to user ', users[socket.id]);
+    })
+
+
+
+}
 
 
 
