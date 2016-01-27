@@ -45,11 +45,6 @@ io.on('connection', function(socket) {
         })
     });
 
-    socket.on('give me ticket', function() {
-
-    })
-
-
     socket.on('game start', function() {
         startNewGame(socket);
     })
@@ -71,8 +66,8 @@ var startNewGame = function(socket) {
     if (!gameIsOn) {
         sendTicket();
         console.log('game will start in ', config.gameStartDelay, ' miliseconds');
+        io.emit('before game starts');
         var timer = setTimeout(function() {
-
             var bingoCalled = false;
             var randomNumbers = shuffle(Numbers());
             gameIsOn = true;
@@ -89,20 +84,15 @@ var startNewGame = function(socket) {
         io.sockets.connected[socket.id].emit('game is on');
     }
 
-
-
 };
 
 function sendTicket() {
 
     Object.keys(io.sockets.connected).forEach(function(socket) {
-        console.log('socket:', io.sockets.connected[socket]);
         var ticket = new Ticket();
         io.sockets.connected[socket].emit('ticket given', ticket);
-        console.log('sending ticket to user ', users[socket.id]);
+        console.log('sending ticket to user');
     })
-
-
 
 }
 

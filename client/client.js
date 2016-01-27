@@ -15,7 +15,7 @@ $(document).ready(function() {
                 $('#ticket').show();
             })
         } else {
-            $('.alert').show();
+            $('#form-alert').show();
         }
         return false;
     })
@@ -27,6 +27,10 @@ $(document).ready(function() {
     socket.on('user disconnected', function(data) {
         updateUsers(data.users);
     });
+
+    socket.on('before game starts', function() {
+        $('#msg').show().text('Game will start shortly');
+    })
 
     socket.on('first user', function() {
         isAdmin = true; //from now on this person starts each game
@@ -54,21 +58,22 @@ $(document).ready(function() {
     })
 
     socket.on('game is on', function() {
-        alert('Sorry, game already started. Please try in a minute!');
+        $('#msg').text('Sorry, game already started. Please try in a minute!');
     })
 
     socket.on('number drawn', function(number) {
+        $('#msg').hide();
         $('#number').text(number);
         removeNumber(number);
         drawTicket();
     });
 
     socket.on('bingo', function(winner) {
-        $('#number').html('BINGO!\n' + winner + ' won!');
-        newGame();
+        $('#msg').show().html('BINGO!\n' + winner + ' won!');
+        showNewGameBtn();
     });
 
-    function newGame() {
+    function showNewGameBtn() {
         if (isAdmin) $('#start').show();
         $('#start').text('Another game');
     }
@@ -94,8 +99,8 @@ $(document).ready(function() {
         if (numbers.length === 12) { //27 - 15, there are 12 nulls     
             console.log('emitting bingo!');
             socket.emit('bingo', nick);
-            $('#number').html('BINGO!\n You won!');
-            newGame();
+            $('#msg').show().html('BINGO!\n You won!');
+            showNewGameBtn();
 
         }
     }
