@@ -5,6 +5,7 @@ $(document).ready(function() {
     var numbers = [];
     var userTicket = {};
     var isAdmin = false;
+    var isWinner = false;
 
     $('#nick-form').submit(function() {
         nick = $('#nick').val();
@@ -41,6 +42,7 @@ $(document).ready(function() {
             click: function() {
                 socket.emit('game start');
                 $(this).hide();
+                isWinner = false;
             }
         });
         var helloMsg = $('<p/>', {
@@ -74,6 +76,15 @@ $(document).ready(function() {
         showNewGameBtn();
     });
 
+    socket.on('game over', function() {
+        console.log('game over')
+            //send results
+        socket.emit('send results', {
+            isWinner: isWinner,
+            name: nick
+        });
+    })
+
     function createWinnnersString(winners) {
         if (winners.length === 1) return winners[0];
         if (winners.length === 2) return winners[0] + ' and ' + winners[1];
@@ -106,7 +117,7 @@ $(document).ready(function() {
         if (numbers.length === 12) { //27 - 15, there are 12 nulls     
             console.log('emitting bingo!');
             socket.emit('bingo', nick);
-            //$('#msg').show().html('BINGO!\n You won!');
+            isWinner = true;
             showNewGameBtn();
 
         }

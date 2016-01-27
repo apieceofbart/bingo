@@ -16,7 +16,7 @@ app.get('/', function(req, res) {
 
 var users = {};
 var gameIsOn = false;
-var winners = [];
+var results = [];
 
 io.on('connection', function(socket) {
 
@@ -50,14 +50,35 @@ io.on('connection', function(socket) {
         startNewGame(socket);
     })
 
-    socket.on('bingo', function(winner) {
-        winners.push(winner);
-        console.log('bingo called, clearing interval, the winner is:', winner);
+    socket.on('bingo', function() {
+        console.log('bingo called, clearing interval');
         bingoCalled = true;
         clearInterval(interval);
         gameIsOn = false;
-        socket.broadcast.emit('announce winners', winners);
+        io.emit('game over');
     })
+
+    socket.on('send results', function(result) {
+        //we might get double calls because of multiple winners..
+        //this is very wrong, will fix when hangover is gone
+        results.push(result);
+        console.log('send results');
+
+        //this below sucks, but no other idea how to handle that
+        //we need to check if we got results from everyone and when we have we sned back the winners 
+        //TODO: what if someone leaves? this might get ugly 
+        console.log(results.length, io.engine.clientsCount);
+        if (results.length > io.engine.clientsCount) {
+            var winners = results.reduce(function(total, current) {
+                if (current.isWinner) return total.concat(current.name);
+                return total;
+            }, []);
+            io.emit('announce winners', winners);
+        }
+
+    })
+
+
 
 });
 
@@ -91,9 +112,10 @@ var startNewGame = function(socket) {
 
 function sendTicket() {
 
-        var ticket = new Ticket();
 
     Object.keys(io.sockets.connected).forEach(function(socket) {
+
+        var ticket = new Ticket();
         io.sockets.connected[socket].emit('ticket given', ticket);
         console.log('sending ticket to user');
     })
