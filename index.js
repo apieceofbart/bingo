@@ -61,22 +61,31 @@ io.on('connection', function(socket) {
     socket.on('send results', function(result) {
         //we might get double calls because of multiple winners..
         //this is very wrong, will fix when hangover is gone
-        results.push(result);
+        addToResults(result);
         console.log('send results');
-
         //this below sucks, but no other idea how to handle that
         //we need to check if we got results from everyone and when we have we sned back the winners 
         //TODO: what if someone leaves? this might get ugly 
         console.log(results.length, io.engine.clientsCount);
-        if (results.length > io.engine.clientsCount) {
-            var winners = results.reduce(function(total, current) {
-                if (current.isWinner) return total.concat(current.name);
-                return total;
-            }, []);
+        if (results.length === io.engine.clientsCount) {
+            var winners = results.filter(function(player) {
+                return player.isWinner
+            }).map(function(winner) {
+                return winner.name
+            });
             io.emit('announce winners', winners);
         }
 
     })
+
+    function addToResults(result) {
+        console.log(result);
+        var isPresent = false;
+        results.forEach(function(r) {
+            if (r.name === result.name) isPresent = true;
+        })
+        if (!isPresent) results.push(result);
+    }
 
 
 
@@ -116,6 +125,7 @@ function sendTicket() {
     Object.keys(io.sockets.connected).forEach(function(socket) {
 
         var ticket = new Ticket();
+
         io.sockets.connected[socket].emit('ticket given', ticket);
         console.log('sending ticket to user');
     })
