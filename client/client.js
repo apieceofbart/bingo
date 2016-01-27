@@ -29,8 +29,8 @@ $(document).ready(function() {
         updateUsers(data.users);
     });
 
-    socket.on('before game starts', function() {
-        $('#msg').show().text('Game will start shortly');
+    socket.on('before game starts', function(time) {
+        showTimeout(time);
     })
 
     socket.on('first user', function() {
@@ -119,6 +119,17 @@ $(document).ready(function() {
             socket.emit('bingo', nick);
             isWinner = true;
             showNewGameBtn();
+        }
+    }
+
+    function showTimeout(time) {
+        var time = Math.floor(time / 1000);
+        if (time > 0) {
+            $('#msg').show().text('Game starts in ' + time);
+            var countdown = setInterval(function() {
+                $('#msg').text('Game starts in ' + --time);
+                if (time < 0) clearInterval(countdown);
+            }, 1000);
 
         }
     }

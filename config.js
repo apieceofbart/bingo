@@ -1,4 +1,4 @@
 module.exports = {
-    gameStartDelay: 0,
+    gameStartDelay: 5000,
     numbersDrawInterval: 100
 }

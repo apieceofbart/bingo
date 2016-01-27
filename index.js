@@ -66,7 +66,7 @@ io.on('connection', function(socket) {
         //this below sucks, but no other idea how to handle that
         //we need to check if we got results from everyone and when we have we sned back the winners 
         //TODO: what if someone leaves? this might get ugly 
-        console.log(results.length, io.engine.clientsCount);
+
         if (results.length === io.engine.clientsCount) {
             var winners = results.filter(function(player) {
                 return player.isWinner
@@ -79,7 +79,6 @@ io.on('connection', function(socket) {
     })
 
     function addToResults(result) {
-        console.log(result);
         var isPresent = false;
         results.forEach(function(r) {
             if (r.name === result.name) isPresent = true;
@@ -99,7 +98,7 @@ var startNewGame = function(socket) {
         winners = [];
         sendTicket();
         console.log('game will start in ', config.gameStartDelay, ' miliseconds');
-        io.emit('before game starts');
+        io.emit('before game starts', config.gameStartDelay);
         var timer = setTimeout(function() {
             var bingoCalled = false;
             var randomNumbers = shuffle(Numbers());
