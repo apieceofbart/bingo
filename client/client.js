@@ -68,10 +68,17 @@ $(document).ready(function() {
         drawTicket();
     });
 
-    socket.on('bingo', function(winner) {
-        $('#msg').show().html('BINGO!\n' + winner + ' won!');
+    socket.on('announce winners', function(winners) {
+        console.log('winners announced:', winners);
+        $('#msg').show().html('BINGO!\n' + createWinnnersString(winners) + ' won!');
         showNewGameBtn();
     });
+
+    function createWinnnersString(winners) {
+        if (winners.length === 1) return winners[0];
+        if (winners.length === 2) return winners[0] + ' and ' + winners[1];
+        return winners[0] + ', ' + createWinnnersString(winners.slice(1));
+    }
 
     function showNewGameBtn() {
         if (isAdmin) $('#start').show();
@@ -99,7 +106,7 @@ $(document).ready(function() {
         if (numbers.length === 12) { //27 - 15, there are 12 nulls     
             console.log('emitting bingo!');
             socket.emit('bingo', nick);
-            $('#msg').show().html('BINGO!\n You won!');
+            //$('#msg').show().html('BINGO!\n You won!');
             showNewGameBtn();
 
         }

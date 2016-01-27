@@ -16,6 +16,7 @@ app.get('/', function(req, res) {
 
 var users = {};
 var gameIsOn = false;
+var winners = [];
 
 io.on('connection', function(socket) {
 
@@ -50,11 +51,12 @@ io.on('connection', function(socket) {
     })
 
     socket.on('bingo', function(winner) {
-        socket.broadcast.emit('bingo', winner);
+        winners.push(winner);
         console.log('bingo called, clearing interval, the winner is:', winner);
         bingoCalled = true;
         clearInterval(interval);
         gameIsOn = false;
+        socket.broadcast.emit('announce winners', winners);
     })
 
 });
@@ -64,6 +66,7 @@ var interval;
 var startNewGame = function(socket) {
 
     if (!gameIsOn) {
+        winners = [];
         sendTicket();
         console.log('game will start in ', config.gameStartDelay, ' miliseconds');
         io.emit('before game starts');
@@ -88,8 +91,9 @@ var startNewGame = function(socket) {
 
 function sendTicket() {
 
-    Object.keys(io.sockets.connected).forEach(function(socket) {
         var ticket = new Ticket();
+
+    Object.keys(io.sockets.connected).forEach(function(socket) {
         io.sockets.connected[socket].emit('ticket given', ticket);
         console.log('sending ticket to user');
     })
