@@ -1,7 +1,7 @@
 var Numbers = require('./Numbers');
 var shuffle = require('./shuffle');
 
-function generateColumns() {
+function generateTicket() {
 
     var numbers = shuffle(Numbers());
 
@@ -31,19 +31,30 @@ function generateColumns() {
             }
         }
     }
-    //add blanks and permute columns
-    columns.map(function(column) {
-        while (column.length < 3) {
-            column.push(null);
-        }
-        column = shuffle(column);
-        //TODO we want sorted results but with blanks
-    });
 
-    return columns;
+    //add blanks, so each column has 3 elements
+    //additionaly make sure we have exactly 5 elements in each row
+    var rows = columnsToRows(columns);
+
+
+
+    while (nonNullLength(rows[0]) !== 5 || nonNullLength(rows[1]) !== 5 || nonNullLength(rows[2]) !== 5) {
+        columns.map(function(column) {
+            while (column.length < 3) {
+                column.push(null);
+            }
+            column = shuffle(column);
+            //TODO we want sorted results but with blanks
+        });
+
+        rows = columnsToRows(columns);
+
+    }
+    return rows;
 }
 
 function columnsToRows(columns) {
+
     var rows = [];
     for (var row = 0; row < 3; row++) {
         rows[row] = [];
@@ -54,8 +65,15 @@ function columnsToRows(columns) {
     return rows;
 }
 
-function Ticket() {
-    this.rows = columnsToRows(generateColumns());
+function nonNullLength(array) {
+    return array.reduce(function(total, curr) {
+        return total += (curr !== null)
+    }, 0)
 }
+
+function Ticket() {
+    this.rows = generateTicket();
+}
+
 
 module.exports = Ticket;
