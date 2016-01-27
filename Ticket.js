@@ -44,13 +44,38 @@ function generateTicket() {
                 column.push(null);
             }
             column = shuffle(column);
-            //TODO we want sorted results but with blanks
         });
 
         rows = columnsToRows(columns);
 
     }
-    return rows;
+
+    return columnsToRows(sortColumns(columns));
+}
+
+function sortColumns(columns) {
+
+    //assuming each column has 3 elements with at least 1 number
+    return columns.map(function(col) {
+        if (nonNullLength(col) === 3) {
+            col = col.sort(function(a, b) {
+                return a > b;
+            })
+        }
+        if (nonNullLength(col) === 2) {
+            //find null and see if we need to swap numbers
+            var nullIndex = col.indexOf(null);
+            var indexArr = [0, 1, 2];
+            indexArr.splice(nullIndex, 1);
+            if (col[indexArr[0]] > col[indexArr[1]]) {
+                var temp = col[indexArr[0]];
+                col[indexArr[0]] = col[indexArr[1]];
+                col[indexArr[1]] = temp;
+            }
+        }
+
+        return col;
+    })
 }
 
 function columnsToRows(columns) {
@@ -74,6 +99,5 @@ function nonNullLength(array) {
 function Ticket() {
     this.rows = generateTicket();
 }
-
 
 module.exports = Ticket;
